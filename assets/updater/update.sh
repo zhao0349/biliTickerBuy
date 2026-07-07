@@ -271,7 +271,35 @@ echo "[biliTickerBuy] 找到程序文件：$PACKAGE_BINARY"
 echo "[biliTickerBuy] 正在替换本地文件..."
 
 if [ "$PLATFORM_KEY" = "android_termux_arm64" ]; then
-  if ! cp -R "$PACKAGE_DIR/." "$INSTALL_DIR/"; then
+  STAGE_DIR="$WORK_DIR/stage"
+  rm -rf "$STAGE_DIR"
+  mkdir -p "$STAGE_DIR"
+
+  if ! cp -R "$PACKAGE_DIR/." "$STAGE_DIR/"; then
+    echo "复制 Termux 更新文件失败。" >&2
+    echo "临时文件已保留在：$WORK_DIR" >&2
+    exit 1
+  fi
+
+  # 不覆盖用户已经配置好的 .env.install。
+  if [ ! -f "$ENV_INSTALL_FILE" ] && [ -f "$PACKAGE_DIR/.env.install" ]; then
+    if ! cp "$PACKAGE_DIR/.env.install" "$ENV_INSTALL_FILE"; then
+      echo "警告：无法安装默认 .env.install。" >&2
+    fi
+  fi
+  rm -f "$STAGE_DIR/.env.install"
+
+  # 避免覆盖当前正在执行的 update.sh。
+  UPDATE_SCRIPT_NEW=""
+  if [ -f "$STAGE_DIR/update.sh" ]; then
+    UPDATE_SCRIPT_NEW="$INSTALL_DIR/.update.sh.new"
+    if cp "$STAGE_DIR/update.sh" "$UPDATE_SCRIPT_NEW"; then
+      chmod +x "$UPDATE_SCRIPT_NEW" || true
+    fi
+    rm -f "$STAGE_DIR/update.sh"
+  fi
+
+  if ! cp -R "$STAGE_DIR/." "$INSTALL_DIR/"; then
     echo "复制 Termux 更新文件失败。" >&2
     echo "临时文件已保留在：$WORK_DIR" >&2
     exit 1
@@ -279,6 +307,15 @@ if [ "$PLATFORM_KEY" = "android_termux_arm64" ]; then
 
   chmod +x "$INSTALL_DIR/$BINARY_NAME"
   rm -f "$INSTALL_DIR/.venv/.deps-ready"
+
+  if [ -n "$UPDATE_SCRIPT_NEW" ] && [ -f "$UPDATE_SCRIPT_NEW" ]; then
+    if ! mv -f "$UPDATE_SCRIPT_NEW" "$INSTALL_DIR/update.sh"; then
+      rm -f "$UPDATE_SCRIPT_NEW"
+      echo "警告：update.sh 更新失败，但主程序已成功更新。" >&2
+    fi
+  fi
+
+  rm -rf "$STAGE_DIR"
 
   rm -f "$TEMP_ZIP"
   rm -rf "$TEMP_EXTRACT"
