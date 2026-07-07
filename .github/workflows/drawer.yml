@@ -102,25 +102,25 @@ jobs:
             find "$RELEASE_DIR" -type d -name '__pycache__' -prune -exec rm -rf {} +
             find "$RELEASE_DIR" -type f -name '*.pyc' -delete
             cat > "$RELEASE_DIR/biliTickerBuy" <<'EOF'
-            #!/usr/bin/env sh
-            set -eu
+#!/usr/bin/env sh
+set -eu
 
-            APP_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
-            VENV_DIR="$APP_DIR/.venv"
-            DEPS_MARKER="$VENV_DIR/.deps-ready"
+APP_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+VENV_DIR="$APP_DIR/.venv"
+DEPS_MARKER="$VENV_DIR/.deps-ready"
 
-            if [ ! -x "$VENV_DIR/bin/python" ]; then
-              python3 -m venv "$VENV_DIR"
-            fi
+if [ ! -x "$VENV_DIR/bin/python" ]; then
+  python3 -m venv "$VENV_DIR"
+fi
 
-            if [ ! -f "$DEPS_MARKER" ]; then
-              "$VENV_DIR/bin/python" -m pip install --upgrade pip
-              "$VENV_DIR/bin/python" -m pip install -r "$APP_DIR/requirements.txt"
-              touch "$DEPS_MARKER"
-            fi
+if [ ! -f "$DEPS_MARKER" ]; then
+  "$VENV_DIR/bin/python" -m pip install --upgrade pip
+  "$VENV_DIR/bin/python" -m pip install -r "$APP_DIR/requirements.txt"
+  touch "$DEPS_MARKER"
+fi
 
-            exec "$VENV_DIR/bin/python" "$APP_DIR/main.py" "$@"
-            EOF
+exec "$VENV_DIR/bin/python" "$APP_DIR/main.py" "$@"
+EOF
             chmod +x "$RELEASE_DIR/biliTickerBuy"
             cp assets/updater/update.sh "$RELEASE_DIR/update.sh"
             chmod +x "$RELEASE_DIR/update.sh"
