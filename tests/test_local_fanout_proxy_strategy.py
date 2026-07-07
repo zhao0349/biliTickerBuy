@@ -306,9 +306,7 @@ def test_proxy_pool_fanout_detects_percent_encoded_create_v2_path():
         connection_factory=FakeH2Connection,
         connections_per_source_ip=2,
     )
-    encoded_create_url = (
-        "https://show.bilibili.com/api/%74icket/%6frder/crea%74eV%32"
-    )
+    encoded_create_url = "https://show.bilibili.com/api/%74icket/%6frder/crea%74eV%32"
 
     response = client.post(
         encoded_create_url,

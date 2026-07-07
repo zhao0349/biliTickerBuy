@@ -215,6 +215,7 @@ def go_start_tab():
                 minimum=1,
                 info="默认抢票请求间隔（单位：毫秒）",
             )
+
     @runtime_state_writer(GO_UPLOADED_FILES_STATE_KEY, kind="path_list")
     def upload(filepath):
         try:

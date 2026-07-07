@@ -55,10 +55,7 @@ def _read_log_text(path: Path, *, max_bytes: int | None = None) -> str:
                 handle.seek(size - max_bytes)
                 data = handle.read()
                 text = data.decode("utf-8", errors="replace")
-                return (
-                    f"[日志较大，已只显示末尾 {max_bytes // 1024}KB]\n"
-                    f"{text}"
-                )
+                return f"[日志较大，已只显示末尾 {max_bytes // 1024}KB]\n{text}"
             handle.seek(0)
         return handle.read().decode("utf-8", errors="replace")
 
@@ -74,9 +71,7 @@ def attach_log_routes(app) -> None:
         name: str | None = Query(default=None),
     ) -> HTMLResponse:
         log_path = _resolve_log_path(raw_path=path, log_name=name)
-        initial_text = escape(
-            _read_log_text(log_path, max_bytes=MAX_INITIAL_LOG_BYTES)
-        )
+        initial_text = escape(_read_log_text(log_path, max_bytes=MAX_INITIAL_LOG_BYTES))
         title = escape(log_path.name)
         stream_url = f"{_LOG_STREAM_ROUTE}?name={quote(log_path.name, safe='')}"
         body = f"""<!doctype html>
