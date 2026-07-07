@@ -5,13 +5,30 @@ REPO="mikumifa/biliTickerBuy"
 UNAME_S="$(uname -s)"
 UNAME_M="$(uname -m)"
 
+is_termux() {
+  [ -n "${TERMUX_VERSION-}" ] && return 0
+
+  case "${PREFIX-}" in
+    */com.termux/files/usr)
+      return 0
+      ;;
+  esac
+
+  [ -d "/data/data/com.termux/files/usr" ] && return 0
+  return 1
+}
+
 case "$UNAME_S:$UNAME_M" in
   Linux:x86_64|Linux:amd64)
     PLATFORM_KEY="linux_amd64"
     BINARY_NAME="biliTickerBuy"
     ;;
   Linux:aarch64|Linux:arm64)
-    PLATFORM_KEY="linux_arm64"
+    if is_termux; then
+      PLATFORM_KEY="android_termux_arm64"
+    else
+      PLATFORM_KEY="linux_arm64"
+    fi
     BINARY_NAME="biliTickerBuy"
     ;;
   Darwin:arm64|Darwin:aarch64)
@@ -252,6 +269,24 @@ PACKAGE_DIR="$(dirname "$PACKAGE_BINARY")"
 
 echo "[biliTickerBuy] 找到程序文件：$PACKAGE_BINARY"
 echo "[biliTickerBuy] 正在替换本地文件..."
+
+if [ "$PLATFORM_KEY" = "android_termux_arm64" ]; then
+  if ! cp -R "$PACKAGE_DIR/." "$INSTALL_DIR/"; then
+    echo "复制 Termux 更新文件失败。" >&2
+    echo "临时文件已保留在：$WORK_DIR" >&2
+    exit 1
+  fi
+
+  chmod +x "$INSTALL_DIR/$BINARY_NAME"
+  rm -f "$INSTALL_DIR/.venv/.deps-ready"
+
+  rm -f "$TEMP_ZIP"
+  rm -rf "$TEMP_EXTRACT"
+
+  echo "[biliTickerBuy] 已更新到 ${RELEASE_TAG}。"
+  echo "请手动重新启动程序。"
+  exit 0
+fi
 
 # 先复制到临时路径，再通过 mv 替换，尽量避免产生半写入文件。
 NEW_BINARY="$INSTALL_DIR/.${BINARY_NAME}.new"

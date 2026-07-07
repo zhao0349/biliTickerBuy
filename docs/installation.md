@@ -6,6 +6,7 @@
 | ------- | -------- | ------------------------------------------- |
 | Windows | 支持     | 推荐 Windows 10 或更高版本                  |
 | Linux   | 支持     | 预构建版本要求 Ubuntu 22.04 或更高版本      |
+| Android | 支持     | 通过 Termux 使用 ARM64 预构建版本           |
 | macOS   | 支持     | 支持 Intel 和 Apple Silicon                 |
 | Docker  | 支持     | 适用于其他 Linux 发行版或无预构建版本的平台 |
 | Python  | 支持     | 推荐 Python 3.11                            |
@@ -23,6 +24,7 @@
 | Windows | x86_64 / AMD64  | `windows_amd64` |
 | Linux   | x86_64 / AMD64  | `linux_amd64`   |
 | Linux   | ARM64 / AArch64 | `linux_arm64`   |
+| Android (Termux) | ARM64 / AArch64 | `android_termux_arm64` |
 | macOS   | Apple Silicon   | `macos_arm64`   |
 | macOS   | Intel           | `macos_intel`   |
 
