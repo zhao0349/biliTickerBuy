@@ -6,6 +6,19 @@ REPO="mikumifa/biliTickerBuy"
 UNAME_S="$(uname -s)"
 UNAME_M="$(uname -m)"
 
+is_termux() {
+  [ -n "${TERMUX_VERSION-}" ] && return 0
+
+  case "${PREFIX-}" in
+    */com.termux/files/usr)
+      return 0
+      ;;
+  esac
+
+  [ -d "/data/data/com.termux/files/usr" ] && return 0
+  return 1
+}
+
 # 未设置 GH_PROXY 时使用默认代理。
 #
 # 禁用代理：
@@ -27,7 +40,11 @@ case "$UNAME_S:$UNAME_M" in
     PLATFORM_KEY="linux_amd64"
     ;;
   Linux:aarch64|Linux:arm64)
-    PLATFORM_KEY="linux_arm64"
+    if is_termux; then
+      PLATFORM_KEY="android_termux_arm64"
+    else
+      PLATFORM_KEY="linux_arm64"
+    fi
     ;;
   Darwin:arm64|Darwin:aarch64)
     PLATFORM_KEY="macos_arm64"

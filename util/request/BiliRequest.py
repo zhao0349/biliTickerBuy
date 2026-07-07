@@ -201,19 +201,18 @@ class BiliRequest:
             client.head(url)
         except httpx.HTTPError:
             pass
+
     @staticmethod
     def _random_quote(path: str) -> str:
-        return ''.join(
-            random.choice([c, f'%{ord(c):02x}']) for c in path
-        )
+        return "".join(random.choice([c, f"%{ord(c):02x}"]) for c in path)
 
     def _h2_send(self, method: str, url: str, data=None, isJson=False):
         parsed_url = urllib.parse.urlparse(url)
 
-        if 'createV2' in parsed_url.path:
+        if "createV2" in parsed_url.path:
             new_path = BiliRequest._random_quote(parsed_url.path)
             url = urllib.parse.urlunparse(parsed_url._replace(path=new_path))
-            
+
         if self._h2_client is None:
             self._h2_client = self._build_h2_client()
         client = self._h2_client
