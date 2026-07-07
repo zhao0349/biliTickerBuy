@@ -157,13 +157,8 @@ jobs:
         if: matrix.config.os.filename != 'windows_amd64' && !startsWith(matrix.config.os.filename, 'macos_')
         shell: bash
         run: |
-          if [ "${{ matrix.config.os.filename }}" = "android_termux_arm64" ]; then
-            cd ./release
-            zip -r ../tmp.zip biliTickerBuy
-          else
-            cd ./dist
-            zip -r ../tmp.zip biliTickerBuy
-          fi
+          cd ./release
+          zip -r ../tmp.zip biliTickerBuy
 
       - name: Zip the Build-macos-cli
         if: startsWith(matrix.config.os.filename, 'macos_')
